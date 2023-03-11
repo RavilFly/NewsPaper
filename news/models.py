@@ -40,6 +40,9 @@ class Post(models.Model):
     content_text = models.TextField()
     content_rate = models.IntegerField(default=1)
 
+    def __str__(self):
+        return f'{self.title} - {self.content_text}'
+
     def like(self):
         self.content_rate += 1
         self.save()
