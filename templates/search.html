@@ -2,27 +2,27 @@
 {% load custom_filters %}
 {% load custom_tags %}
 
-
+<!-- Название у нас будет products -->
 {% block title %}
-Posts
+Поиск новостей
 {% endblock title %}
 
 
 <!-- В контенте на странице мы выводим все товары -->
 {% block content %}
-    <h3>Все посты (всего на странице - {{ posts|length}})</h3>
+    <h3>Выберите критерии поиска</h3>
 
-    <h3>{% current_time %}</h3>
-<!--   <form action="" method="get">-->
-<!--       {# Переменная, которую мы передали через контекст, может сгенерировать нам форму с полями #}-->
-<!--       {{ filterset.form.as_p }}-->
-<!--       {# Добавим кнопку отправки данных формы #}-->
-<!--       <input type="submit" value="Найти" />-->
-<!--   </form>-->
+    <h4>{{ time_now|date:'d M Y'}}</h4>
+   <form action="" method="get">
+       {# Переменная, которую мы передали через контекст, может сгенерировать нам форму с полями #}
+       {{ filterset.form.as_p }}
+       {# Добавим кнопку отправки данных формы #}
+       <input type="submit" value="Найти" />
+   </form>
 
 
     <hr>
-    {% if posts %}
+    {% if post_search %}
        <table>
            <tr>
                <td>Заголовок</td>
@@ -31,7 +31,7 @@ Posts
                <td>Рейтинг</td>
            </tr>
 
-           {% for post in posts %}
+           {% for post in post_search %}
            <tr>
                <td>{{ post.title|censor }}</td>
                <td>{{ post.time_in|date:'d M Y' }}</td>
@@ -76,3 +76,5 @@ Posts
 
 
 {% endblock content %}
+
+

@@ -2,17 +2,17 @@
 {% load custom_filters %}
 {% load custom_tags %}
 
-
+<!-- Название у нас будет products -->
 {% block title %}
-Posts
+Новости
 {% endblock title %}
 
 
 <!-- В контенте на странице мы выводим все товары -->
 {% block content %}
-    <h3>Все посты (всего на странице - {{ posts|length}})</h3>
+    <h3>Все новости (всего на странице - {{ news|length}})</h3>
 
-    <h3>{% current_time %}</h3>
+    <h4>{{ time_now|date:'d M Y'}}</h4>
 <!--   <form action="" method="get">-->
 <!--       {# Переменная, которую мы передали через контекст, может сгенерировать нам форму с полями #}-->
 <!--       {{ filterset.form.as_p }}-->
@@ -22,7 +22,7 @@ Posts
 
 
     <hr>
-    {% if posts %}
+    {% if news %}
        <table>
            <tr>
                <td>Заголовок</td>
@@ -31,13 +31,15 @@ Posts
                <td>Рейтинг</td>
            </tr>
 
-           {% for post in posts %}
+           {% for post in news %}
+           {% if post.content == 'NW' %}
            <tr>
                <td>{{ post.title|censor }}</td>
                <td>{{ post.time_in|date:'d M Y' }}</td>
                <td>{{ post.content_text|censor|truncatewords:20 }}</td>
                <td>{{ post.content_rate }}</td>
            </tr>
+           {% endif %}
            {% endfor %}
        </table>
     {% else %}

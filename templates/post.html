@@ -8,7 +8,7 @@
 
 {% block content %}
 
-    <h2> {{ post.title|censor }}</h2>
+    <h3> {{ post.title|censor }}</h3>
     <h4>Дата публикации: {{post.time_in|date:'d M Y'}}</h4>
     <hr>
     {{ post.content_text|censor }}
