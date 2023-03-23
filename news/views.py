@@ -1,6 +1,12 @@
+from django.shortcuts import redirect, render
+from django.contrib.auth.models import Group
+from django.contrib.auth.decorators import login_required
+
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import (
-    ListView, DetailView, CreateView, UpdateView, DeleteView,
+    ListView, DetailView, CreateView, UpdateView,
+    DeleteView, TemplateView,
 )
 from .models import Post
 from datetime import datetime
@@ -31,15 +37,18 @@ class PostDetail(DetailView):
     context_object_name = 'post'
 
 
-class PostUpdate(UpdateView):
+class PostUpdate(PermissionRequiredMixin, UpdateView):
     form_class = PostForm
     model = Post
+    permission_required = ('news.change_post')
     template_name = 'post_edit.html'
 
 
-class PostDelete(DeleteView):
+
+class PostDelete(PermissionRequiredMixin, DeleteView):
     model = Post
     template_name = 'post_delete.html'
+    permission_required = ('news.delete_post')
     success_url = reverse_lazy('post_list')
 
 
@@ -64,7 +73,7 @@ class NewsList(ListView):
         return context
 
 
-class NewsSearch(ListView):
+class NewsSearch(LoginRequiredMixin, ListView):
     model = Post
     queryset = Post.objects.filter(content='NW')
     ordering = '-time_in'
@@ -85,10 +94,11 @@ class NewsSearch(ListView):
         return context
 
 
-class NewsCreate(CreateView):
+class NewsCreate(PermissionRequiredMixin, CreateView):
     form_class = PostForm
     model = Post
-    template_name = 'news_edit.html'
+    permission_required = ('news.add_post')
+    template_name = 'post_edit.html'
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -120,7 +130,7 @@ class ArticlesList(ListView):
 
 
 
-class ArticlesSearch(ListView):
+class ArticlesSearch(LoginRequiredMixin, ListView):
     model = Post
     queryset = Post.objects.filter(content='AC')
     ordering = '-time_in'
@@ -139,15 +149,34 @@ class ArticlesSearch(ListView):
         context['filterset'] = self.filterset
         return context
 
-class ArticleCreate(CreateView):
+class ArticleCreate(PermissionRequiredMixin, CreateView):
     form_class = PostForm
     model = Post
-    template_name = 'articles_edit.html'
+    permission_required = ('news.add_post')
+    template_name = 'post_edit.html'
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.content = 'AC'
         self.object.save()
         return super().form_valid(form)
+
+class IndexView(LoginRequiredMixin, TemplateView):
+    template_name = 'index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_not_author'] = not self.request.user.groups.filter(name = 'author').exists()
+        return context
+
+
+
+@login_required
+def upgrade_me(request):
+    user = request.user
+    author_group = Group.objects.get(name='author')
+    if not request.user.groups.filter(name='author').exists():
+        author_group.user_set.add(user)
+    return redirect('/')
 
 

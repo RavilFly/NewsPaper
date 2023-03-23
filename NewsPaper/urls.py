@@ -15,13 +15,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from news.views import IndexView, upgrade_me
 
 
 urlpatterns = [
+
     path("admin/", admin.site.urls),
     path('pages/', include('django.contrib.flatpages.urls')),
     #path('articles/', include('news.urls')),
     path('posts/', include('news.urls')),
     #path('news/', include('news.urls')),
+    path('accounts/', include('allauth.urls')),
+    path('', IndexView.as_view()),
+    path('upgrade/', upgrade_me, name='upgrade'),
 
 ]
