@@ -1,0 +1,89 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+{% load custom_tags %}
+
+
+{% block title %}
+Posts by Category
+{% endblock title %}
+
+
+<!-- В контенте на странице мы выводим все товары -->
+{% block content %}
+
+    <h3 class="text-center">Все посты категории "{{ category.subject }}" <span class="text-muted fs-6 fw-normal">всего - {{ page_obj.paginator.num_pages }}</span></h3>
+    {% if is_not_subscriber %}
+        <p class="text-center"><a href="{% url 'subscribe' category.id %}" class="btn btn-secondary btn-sm"> Подписаться </a></p>
+    {% endif %}
+
+<!--    <h3>{% current_time %}</h3>-->
+<!--    {% if is_not_subscriber %}-->
+<!--        <p class="text-center"><a href="{}" class="btn btn-secondary btn-sm">Подписаться</a></p>-->
+<!--    {% endif %}-->
+<!--   <form action="" method="get">-->
+<!--       {# Переменная, которую мы передали через контекст, может сгенерировать нам форму с полями #}-->
+<!--       {{ filterset.form.as_p }}-->
+<!--       {# Добавим кнопку отправки данных формы #}-->
+<!--       <input type="submit" value="Найти" />-->
+<!--   </form>-->
+
+
+    <hr>
+    {% if category_news_list %}
+       <table>
+           <tr>
+               <td>Заголовок</td>
+               <td>Дата публикации</td>
+               <td>Описание</td>
+               <td>Рейтинг</td>
+
+           </tr>
+
+           {% for post in category_news_list %}
+           <tr>
+               <td>{{ post.title|censor }}</td>
+               <td>{{ post.time_in|date:'d M Y' }}</td>
+               <td>{{ post.content_text|censor|truncatewords:20 }}</td>
+               <td>{{ post.content_rate }}</td>
+
+           </tr>
+           {% endfor %}
+       </table>
+    {% else %}
+        <h3>Новости не найдены</h3>
+    {% endif %}
+
+
+
+
+   {# Информация о предыдущих страницах #}
+
+   {% if page_obj.has_previous %}
+        <a href="?{% url_replace page=1 %}">В начало</a>
+        <a href="?{% url_replace page=page_obj.previous_page_number %}">&lsaquo;</a>
+        {% if page_obj.previous_page_number != previous %}
+           ...
+           <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+        {% endif %}
+   {% endif %}
+
+   {# Информация о текущей странице #}
+   {{ page_obj.number }}
+
+   {# Информация о следующих страницах #}
+   {% if page_obj.has_next %}
+       <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+
+        {% if page_obj.has_next %}
+            <a href="?{% url_replace page=page_obj.next_page_number %}">&rsaquo;</a>
+            <a href="?{% url_replace page=page_obj.paginator.num_pages %}">В конец</a>
+        {% endif %}
+
+
+
+{% endblock content %}
