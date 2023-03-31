@@ -8,7 +8,7 @@ from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView,
     DeleteView, TemplateView,
 )
-from .models import Post, Category
+from .models import Post, Category, Author
 from datetime import datetime
 from .filters import PostFilter
 from .forms import PostForm
@@ -103,6 +103,7 @@ class NewsCreate(PermissionRequiredMixin, CreateView):
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.content = 'NW'
+        self.object.author = Author.objects.get(user_relation=self.request.user)
         self.object.save()
         return super().form_valid(form)
 
@@ -177,6 +178,8 @@ def upgrade_me(request):
     author_group = Group.objects.get(name='author')
     if not request.user.groups.filter(name='author').exists():
         author_group.user_set.add(user)
+    if not Author.objects.filter(user_relation=request.user).exists():
+        Author.objects.create(user_relation=request.user)
     return redirect('/')
 
 class CategoryListView(ListView):
